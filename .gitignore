@@ -11,3 +11,9 @@
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
+
+# all data file
+data/
+
+# python notebook checkpoints
+.ipynb_checkpoints/
