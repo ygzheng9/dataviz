@@ -1,0 +1,117 @@
+<html>
+<head>
+        <meta charset="utf-8">
+        <title>World Cloud</title>
+<style>
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+</style>
+</head>
+
+
+<body onload="loadData()">
+
+<script src="../lib/d3.v3.min.js"> </script>
+<script src="../lib/d3.layout.cloud.js"> </script>
+<script src="../lib/d3.tip.v0.6.3.js"> </script>
+
+<script>
+
+var loadData = function() {
+  console.log('now loading...');
+  d3.csv("word_cnt.txt", function(data) { drawCloud(data); });
+};
+
+var drawCloud = function(data) {
+  console.log(data.length);
+
+  d3.layout.cloud().size([600, 600])
+        .words(data)
+        .padding(5)
+        .rotate(function() { return ~~(Math.random() * 2) * 90; })
+        .font("Impact")
+        .fontSize(function(d) { return parseInt(d.cnt); })
+        .on("end", draw)
+        .start();
+};
+
+var fill = d3.scale.category20();
+var keywords = ['互联网+', '大数据', '移动'];
+
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>频次:</strong> <span style='color:red'>" + d.cnt + "</span>";
+  });
+
+var draw = function(words) {
+  var svg = d3.select("body").append("svg")
+        .attr("width", 600)
+        .attr("height", 600)
+      .append("g")
+        .attr("transform", "translate(300,300)");
+
+  svg.call(tip);
+
+    // d3.select("body").append("svg")
+    //     .attr("width", 600)
+    //     .attr("height", 600)
+    //   .append("g")
+    //     .attr("transform", "translate(300,300)")
+
+  svg.selectAll("text")
+      .data(words)
+      .enter().append("text")
+        .style("font-size", function(d) { return d.size + "px"; })
+        .style("font-family", "Impact")
+        .style("fill", function(d, i) {
+          if (keywords.indexOf(d.word) > -1) {
+            return 'red';
+          } else {
+            return fill(i);
+          }
+        })
+        .attr("text-anchor", "middle")
+        .attr("transform", function(d) {
+          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+        })
+        .text(function(d) { return d.word; })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
+  };
+
+
+
+
+
+
+</script>
+</body>
+</html>
